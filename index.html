@@ -12,7 +12,6 @@ body {
     margin: 0;
 }
 
-/* 🔹 Cabeçalho compacto e verde */
 .topo {
     background-color: #2e7d32;
     color: white;
@@ -20,7 +19,7 @@ body {
 }
 
 .logo {
-    width: 90px;
+    width: 80px;
 }
 
 .topo h2 {
@@ -29,9 +28,30 @@ body {
 
 .topo p {
     margin: 2px 0;
+    font-size: 14px;
 }
 
-/* 🔥 TIMER FLUTUANTE */
+.acesso {
+    margin-top: 10px;
+}
+
+.acesso input {
+    padding: 8px;
+    font-size: 16px;
+    width: 180px;
+    text-align: center;
+}
+
+.acesso button {
+    padding: 8px 15px;
+    font-size: 16px;
+    background-color: white;
+    color: #2e7d32;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
 #contador {
     position: fixed;
     top: 20px;
@@ -43,58 +63,82 @@ body {
     font-size: 18px;
     font-weight: bold;
     z-index: 9999;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
 }
 
-input {
-    padding: 12px;
-    font-size: 18px;
-    width: 260px;
-    text-align: center;
+#telaInicial {
+    margin-top: 60px;
+    font-size: 22px;
+    color: #2e7d32;
 }
 
-button {
-    padding: 12px 20px;
-    background-color: #2e7d32;
-    color: white;
-    border: none;
-    cursor: pointer;
+.check {
+    font-size: 120px;
 }
 
 iframe {
     width: 100%;
     height: 900px;
     display: none;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .info {
-    margin-top: 20px;
+    margin-top: 10px;
     font-weight: bold;
+}
+
+/* 🔥 OVERLAY */
+#overlay {
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.85);
+    color:white;
+    z-index:99999;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ⏳ TIMER -->
 <div id="contador">⏳ 60:00</div>
+
+<!-- 🔥 OVERLAY -->
+<div id="overlay">
+    <div style="font-size:22px; margin-bottom:20px;">
+        Verificando ambiente...
+    </div>
+
+    <div style="width:300px; height:20px; background:#555; border-radius:10px;">
+        <div id="barra" style="width:0%; height:100%; background:#00ff00; border-radius:10px;"></div>
+    </div>
+</div>
 
 <div class="topo">
     <img src="imagem1.png" class="logo">
     <h2>EEMTI DRAGÃO DO MAR</h2>
-    <p>AVALIAÇÕES BIMESTRAIS - 1ª ETAPA 2026</p>
+    <p>Ambiente de Avaliação Controlado</p>
+
+    <div class="acesso">
+        <input type="text" id="codigo" placeholder="Código da prova">
+        <button id="btnAcessar" onclick="acessarProva()">Acessar</button>
+    </div>
 </div>
 
-<div>
-    <p><strong>DIGITE O CÓDIGO DA PROVA</strong></p>
-    <input type="text" id="codigo">
-    <button onclick="acessarProva()">Acessar</button>
+<div id="telaInicial">
+    <div class="check">✔</div>
+    <div>Sistema pronto para aplicação</div>
 </div>
 
 <div id="infoProva" class="info"></div>
 
-<iframe id="frameProva"></iframe>
+<iframe id="frameProva" onload="provaCarregada()"></iframe>
 
 <script>
 
@@ -103,7 +147,6 @@ let tempoRestante = 60 * 60;
 let intervalo;
 
 function iniciarContador() {
-
     intervalo = setInterval(() => {
 
         let minutos = Math.floor(tempoRestante / 60);
@@ -111,67 +154,99 @@ function iniciarContador() {
 
         segundos = segundos < 10 ? "0" + segundos : segundos;
 
-        document.getElementById("contador").innerText =
-            "⏳ " + minutos + ":" + segundos;
+        contador.innerText = "⏳ " + minutos + ":" + segundos;
 
         tempoRestante--;
 
-        if (tempoRestante <= 300) {
-            document.getElementById("contador").style.color = "red";
-        }
+        if (tempoRestante <= 300) contador.style.color = "red";
+        else if (tempoRestante <= 900) contador.style.color = "yellow";
 
         if (tempoRestante < 0) {
             clearInterval(intervalo);
             alert("⏰ Tempo encerrado!");
-            document.getElementById("frameProva").style.display = "none";
+            frameProva.style.display = "none";
         }
 
     }, 1000);
 }
 
-// ⚠️ AVISO
+// 🔥 ANIMAÇÃO
+function mostrarVerificacao() {
+
+    let overlay = document.getElementById("overlay");
+    let barra = document.getElementById("barra");
+
+    overlay.style.display = "flex";
+    barra.style.width = "0%";
+
+    let progresso = 0;
+
+    let anim = setInterval(() => {
+        progresso += 5;
+        barra.style.width = progresso + "%";
+
+        if (progresso >= 100) {
+            clearInterval(anim);
+            setTimeout(() => {
+                overlay.style.display = "none";
+            }, 500);
+        }
+
+    }, 80);
+}
+
+// 🔥 remove carregando
+function provaCarregada() {
+    document.getElementById("infoProva").innerHTML = "";
+}
+
+// ⚠️ aviso
 function avisoInicial() {
     return confirm(
         "⚠️ ATENÇÃO!\n\n" +
-        "SUA AVALIAÇÃO É MONITORADA.\n\n" +
-        "• Não saia da aba\n" +
-        "• Não minimize a tela\n" +
-        "• Mantenha em tela cheia\n\n" +
-        "Deseja iniciar?"
+        "Esta avaliação possui monitoramento de comportamento.\n\n" +
+        "• Saídas da tela são detectadas\n" +
+        "• Tempo é controlado automaticamente\n\n" +
+        "Prossiga apenas se estiver pronto."
     );
 }
 
-// 🔒 TELA CHEIA
+// 🔒 tela cheia
 function entrarTelaCheia() {
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-    }
+    document.documentElement.requestFullscreen();
 }
 
-// 👀 SAÍDA DA ABA
+// 👀 DETECÇÃO DE ABA
 document.addEventListener("visibilitychange", function() {
+
     if (document.hidden) {
-        alert("⚠️ Atenção: saída da aba detectada, alerta enviado à coordenação !");
+        alert("⚠️ Saída da aba detectada.");
+    }
+
+    if (!document.hidden) {
+        mostrarVerificacao(); // 🔥 animação ao voltar
     }
 });
 
-// 👀 SAÍDA DA TELA CHEIA (VERSÃO CORRIGIDA)
+// 👀 tela cheia
 document.addEventListener("fullscreenchange", () => {
     if (!document.fullscreenElement) {
 
         let voltar = confirm(
-            "⚠️ Você saiu do modo tela cheia, alerta enviado à coordenação !\n\nClique em OK para retornar à prova."
+            "⚠️ Atenção: saída do modo prova detectada.\n\nClique em OK para continuar."
         );
 
         if (voltar) {
+            mostrarVerificacao();
             entrarTelaCheia();
         }
     }
 });
 
-// 🚀 ACESSO
+// 🚀 acesso
 function acessarProva() {
 
+    let btn = document.getElementById("btnAcessar");
     let input = document.getElementById("codigo");
     let codigo = input.value.toUpperCase().trim();
 
@@ -211,47 +286,27 @@ function acessarProva() {
         "DMAR3LIN1N": ""
     };
 
-    let serie = codigo.charAt(4);
-    let area = codigo.substring(5,8);
-    let bimestre = codigo.charAt(8);
-    let turno = codigo.endsWith("N") ? "Noite" : "Integral";
-
-    let nomeSerie = {
-        "1": "1º Ano",
-        "2": "2º Ano",
-        "3": "3º Ano"
-    };
-
-    let nomeArea = {
-        "MAT": "Matemática",
-        "NAT": "Ciências da Natureza",
-        "HUM": "Ciências Humanas",
-        "LIN": "Linguagens"
-    };
-
-    if (provas[codigo] && provas[codigo] !== "") {
-
-        if (!avisoInicial()) return;
-
-        entrarTelaCheia();
-        iniciarContador();
-
-        document.getElementById("infoProva").innerHTML =
-            nomeSerie[serie] + " - " +
-            nomeArea[area] + " - " +
-            bimestre + "º Bimestre - " +
-            turno;
-
-        input.value = "BOA SORTE!";
-        input.disabled = true;
-
-        let frame = document.getElementById("frameProva");
-        frame.src = provas[codigo];
-        frame.style.display = "block";
-
-    } else {
+    if (!provas[codigo] || provas[codigo] === "") {
         alert("Código inválido ou prova não disponível.");
+        return;
     }
+
+    if (!avisoInicial()) return;
+
+    btn.disabled = true;
+
+    document.getElementById("telaInicial").style.display = "none";
+    document.getElementById("infoProva").innerHTML = "Carregando prova...";
+
+    entrarTelaCheia();
+    iniciarContador();
+
+    let frame = document.getElementById("frameProva");
+    frame.src = provas[codigo];
+    frame.style.display = "block";
+
+    input.value = "BOA SORTE!";
+    input.disabled = true;
 }
 </script>
 
