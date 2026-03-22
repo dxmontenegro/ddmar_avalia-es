@@ -133,7 +133,7 @@ function iniciarContador() {
 function avisoInicial() {
     return confirm(
         "⚠️ ATENÇÃO!\n\n" +
-        "Esta é uma avaliação monitorada.\n\n" +
+        "SUA AVALIAÇÃO É MONITORADA.\n\n" +
         "• Não saia da aba\n" +
         "• Não minimize a tela\n" +
         "• Mantenha em tela cheia\n\n" +
@@ -151,7 +151,7 @@ function entrarTelaCheia() {
 // 👀 SAÍDA DA ABA
 document.addEventListener("visibilitychange", function() {
     if (document.hidden) {
-        alert("⚠️ Atenção: saída da aba detectada.");
+        alert("⚠️ Atenção: saída da aba detectada, alerta enviado à coordenação !");
     }
 });
 
@@ -160,7 +160,7 @@ document.addEventListener("fullscreenchange", () => {
     if (!document.fullscreenElement) {
 
         let voltar = confirm(
-            "⚠️ Você saiu do modo tela cheia!\n\nClique em OK para retornar à prova."
+            "⚠️ Você saiu do modo tela cheia, alerta enviado à coordenação !\n\nClique em OK para retornar à prova."
         );
 
         if (voltar) {
