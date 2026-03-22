@@ -95,7 +95,7 @@ iframe {
     left:0;
     width:100%;
     height:100%;
-    background:rgba(0,0,0,0.85);
+    background:rgba(0,0,0,0.9);
     color:white;
     z-index:99999;
     align-items:center;
@@ -111,13 +111,32 @@ iframe {
 
 <!-- 🔥 OVERLAY -->
 <div id="overlay">
-    <div style="font-size:22px; margin-bottom:20px;">
-        Informando para Wesley ,Rafael e Breno.....
+
+    <div style="font-size:26px; margin-bottom:20px;">
+        ⚙️ Verificando ambiente...
     </div>
 
-    <div style="width:300px; height:20px; background:#555; border-radius:10px;">
-        <div id="barra" style="width:0%; height:100%; background:#00ff00; border-radius:10px;"></div>
+    <div style="margin-bottom:10px; font-size:18px;">
+        🌐 IP: detectado
     </div>
+
+    <div style="margin-bottom:20px; font-size:15px; color:#ccc;">
+        🛡️ Comportamento fora do padrão identificado
+    </div>
+
+    <div style="width:300px; height:20px; background:#555; border-radius:10px; overflow:hidden;">
+        <div id="barra" style="
+            width:0%;
+            height:100%;
+            background:linear-gradient(90deg, #00ff00, #00cc66);
+            border-radius:10px;
+        "></div>
+    </div>
+
+    <div style="margin-top:15px; font-size:13px; color:#aaa;">
+        🔒 Validando integridade da sessão...
+    </div>
+
 </div>
 
 <div class="topo">
@@ -182,17 +201,18 @@ function mostrarVerificacao() {
     let progresso = 0;
 
     let anim = setInterval(() => {
-        progresso += 5;
+        progresso += 2;
         barra.style.width = progresso + "%";
 
         if (progresso >= 100) {
             clearInterval(anim);
+
             setTimeout(() => {
                 overlay.style.display = "none";
-            }, 500);
+            }, 800);
         }
 
-    }, 80);
+    }, 120);
 }
 
 // 🔥 remove carregando
@@ -224,8 +244,9 @@ document.addEventListener("visibilitychange", function() {
     }
 
     if (!document.hidden) {
-        mostrarVerificacao(); // 🔥 animação ao voltar
+        mostrarVerificacao();
     }
+
 });
 
 // 👀 tela cheia
