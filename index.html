@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Avaliações Bimestrais</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+
+/* 🔹 Cabeçalho compacto e verde */
+.topo {
+    background-color: #2e7d32;
+    color: white;
+    padding: 10px;
+}
+
+.logo {
+    width: 90px;
+}
+
+.topo h2 {
+    margin: 5px 0;
+}
+
+.topo p {
+    margin: 2px 0;
+}
+
+/* 🔥 TIMER FLUTUANTE */
+#contador {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #000;
+    color: #00ff00;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 9999;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+input {
+    padding: 12px;
+    font-size: 18px;
+    width: 260px;
+    text-align: center;
+}
+
+button {
+    padding: 12px 20px;
+    background-color: #2e7d32;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+iframe {
+    width: 100%;
+    height: 900px;
+    display: none;
+    margin-top: 20px;
+}
+
+.info {
+    margin-top: 20px;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ⏳ TIMER -->
+<div id="contador">⏳ 60:00</div>
+
+<div class="topo">
+    <img src="imagem1.png" class="logo">
+    <h2>EEMTI DRAGÃO DO MAR</h2>
+    <p>AVALIAÇÕES BIMESTRAIS - 1ª ETAPA 2026</p>
+</div>
+
+<div>
+    <p><strong>DIGITE O CÓDIGO DA PROVA</strong></p>
+    <input type="text" id="codigo">
+    <button onclick="acessarProva()">Acessar</button>
+</div>
+
+<div id="infoProva" class="info"></div>
+
+<iframe id="frameProva"></iframe>
+
+<script>
+
+// ⏳ CONTADOR
+let tempoRestante = 60 * 60;
+let intervalo;
+
+function iniciarContador() {
+
+    intervalo = setInterval(() => {
+
+        let minutos = Math.floor(tempoRestante / 60);
+        let segundos = tempoRestante % 60;
+
+        segundos = segundos < 10 ? "0" + segundos : segundos;
+
+        document.getElementById("contador").innerText =
+            "⏳ " + minutos + ":" + segundos;
+
+        tempoRestante--;
+
+        if (tempoRestante <= 300) {
+            document.getElementById("contador").style.color = "red";
+        }
+
+        if (tempoRestante < 0) {
+            clearInterval(intervalo);
+            alert("⏰ Tempo encerrado!");
+            document.getElementById("frameProva").style.display = "none";
+        }
+
+    }, 1000);
+}
+
+// ⚠️ AVISO
+function avisoInicial() {
+    return confirm(
+        "⚠️ ATENÇÃO!\n\n" +
+        "Esta é uma avaliação monitorada.\n\n" +
+        "• Não saia da aba\n" +
+        "• Não minimize a tela\n" +
+        "• Mantenha em tela cheia\n\n" +
+        "Deseja iniciar?"
+    );
+}
+
+// 🔒 TELA CHEIA
+function entrarTelaCheia() {
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+    }
+}
+
+// 👀 SAÍDA DA ABA
+document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+        alert("⚠️ Atenção: saída da aba detectada.");
+    }
+});
+
+// 👀 SAÍDA DA TELA CHEIA (VERSÃO CORRIGIDA)
+document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) {
+
+        let voltar = confirm(
+            "⚠️ Você saiu do modo tela cheia!\n\nClique em OK para retornar à prova."
+        );
+
+        if (voltar) {
+            entrarTelaCheia();
+        }
+    }
+});
+
+// 🚀 ACESSO
+function acessarProva() {
+
+    let input = document.getElementById("codigo");
+    let codigo = input.value.toUpperCase().trim();
+
+    const provas = {
+
+        // 🔹 1º ANO
+        "DMAR1MAT1": "https://docs.google.com/forms/d/e/1FAIpQLSel6_ekoikgL-WvTB0yC59m77YOnn0WG8qYxMeGYHw3BGXHag/viewform?embedded=true",
+        "DMAR1NAT1": "",
+        "DMAR1HUM1": "",
+        "DMAR1LIN1": "",
+
+        "DMAR1MAT1N": "",
+        "DMAR1NAT1N": "",
+        "DMAR1HUM1N": "",
+        "DMAR1LIN1N": "",
+
+        // 🔹 2º ANO
+        "DMAR2MAT1": "https://docs.google.com/forms/d/e/1FAIpQLSdwTbM4mBrO8Kmu__Rlv-SNo32NJw9QoIJtnR-lTv1S_lZTPg/viewform?embedded=true",
+        "DMAR2NAT1": "",
+        "DMAR2HUM1": "",
+        "DMAR2LIN1": "",
+
+        "DMAR2MAT1N": "",
+        "DMAR2NAT1N": "",
+        "DMAR2HUM1N": "",
+        "DMAR2LIN1N": "",
+
+        // 🔹 3º ANO
+        "DMAR3MAT1": "https://docs.google.com/forms/d/e/1FAIpQLSfHB1pODQjI2WZbInqlHdLk1ZVbcFSBgXi3gKn50j9TPWSUlw/viewform?embedded=true",
+        "DMAR3NAT1": "",
+        "DMAR3HUM1": "",
+        "DMAR3LIN1": "",
+
+        "DMAR3MAT1N": "",
+        "DMAR3NAT1N": "",
+        "DMAR3HUM1N": "",
+        "DMAR3LIN1N": ""
+    };
+
+    let serie = codigo.charAt(4);
+    let area = codigo.substring(5,8);
+    let bimestre = codigo.charAt(8);
+    let turno = codigo.endsWith("N") ? "Noite" : "Manhã/Tarde";
+
+    let nomeSerie = {
+        "1": "1º Ano",
+        "2": "2º Ano",
+        "3": "3º Ano"
+    };
+
+    let nomeArea = {
+        "MAT": "Matemática",
+        "NAT": "Ciências da Natureza",
+        "HUM": "Ciências Humanas",
+        "LIN": "Linguagens"
+    };
+
+    if (provas[codigo] && provas[codigo] !== "") {
+
+        if (!avisoInicial()) return;
+
+        entrarTelaCheia();
+        iniciarContador();
+
+        document.getElementById("infoProva").innerHTML =
+            nomeSerie[serie] + " - " +
+            nomeArea[area] + " - " +
+            bimestre + "º Bimestre - " +
+            turno;
+
+        input.value = "BOA SORTE!";
+        input.disabled = true;
+
+        let frame = document.getElementById("frameProva");
+        frame.src = provas[codigo];
+        frame.style.display = "block";
+
+    } else {
+        alert("Código inválido ou prova não disponível.");
+    }
+}
+</script>
+
+</body>
+</html>
