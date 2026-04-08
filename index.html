@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Avaliações Bimestrais</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 0;
+}
+
+.topo {
+    background-color: #ff00fb;
+    color: white;
+    padding: 10px;
+}
+
+.logo {
+    width: 80px;
+}
+
+.topo h2 {
+    margin: 5px 0;
+}
+
+.topo p {
+    margin: 2px 0;
+    font-size: 14px;
+}
+
+.acesso {
+    margin-top: 10px;
+}
+
+.acesso input {
+    padding: 8px;
+    font-size: 16px;
+    width: 180px;
+    text-align: center;
+}
+
+.acesso button {
+    padding: 8px 15px;
+    font-size: 16px;
+    background-color: white;
+    color: #2e7d32;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#contador {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #000;
+    color: #00ff00;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 9999;
+}
+
+#telaInicial {
+    margin-top: 60px;
+    font-size: 22px;
+    color: #2e7d32;
+}
+
+.check {
+    font-size: 120px;
+}
+
+iframe {
+    width: 100%;
+    height: 900px;
+    display: none;
+    margin-top: 10px;
+}
+
+.info {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* 🔥 OVERLAY */
+#overlay {
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.9);
+    color:white;
+    z-index:99999;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
+</style>
+</head>
+
+<body>
+
+<div id="contador">⏳ 60:00</div>
+
+<!-- 🔥 OVERLAY -->
+<div id="overlay">
+
+    <div style="font-size:26px; margin-bottom:20px;">
+        ⚙️ Verificando ambiente...
+    </div>
+
+    <div style="margin-bottom:10px; font-size:18px;">
+        🌐 IP: detectado
+    </div>
+
+    <div style="margin-bottom:20px; font-size:15px; color:#ccc;">
+        🛡️ Comportamento fora do padrão identificado
+    </div>
+
+    <div style="width:300px; height:20px; background:#555; border-radius:10px; overflow:hidden;">
+        <div id="barra" style="
+            width:0%;
+            height:100%;
+            background:linear-gradient(90deg, #00ff00, #00cc66);
+            border-radius:10px;
+        "></div>
+    </div>
+
+    <div style="margin-top:15px; font-size:13px; color:#aaa;">
+        ✅ COORDENAÇÃO NOTIFICADA 
+    </div>
+
+</div>
+
+<div class="topo">
+    <img src="imagem1.png" class="logo">
+    <h2>EEMTI DRAGÃO DO MAR</h2>
+    <p>Ambiente de Avaliação Controlado</p>
+
+    <div class="acesso">
+        <input type="text" id="codigo" placeholder="Código da prova">
+        <button id="btnAcessar" onclick="acessarProva()">Acessar</button>
+    </div>
+</div>
+
+<div id="telaInicial">
+    <div class="check">✔</div>
+    <div>Sistema pronto para aplicação</div>
+</div>
+
+<div id="infoProva" class="info"></div>
+
+<iframe id="frameProva" onload="provaCarregada()"></iframe>
+
+<script>
+
+// ⏳ CONTADOR
+let tempoRestante = 60 * 60;
+let intervalo;
+
+function iniciarContador() {
+    intervalo = setInterval(() => {
+
+        let minutos = Math.floor(tempoRestante / 60);
+        let segundos = tempoRestante % 60;
+
+        segundos = segundos < 10 ? "0" + segundos : segundos;
+
+        contador.innerText = "⏳ " + minutos + ":" + segundos;
+
+        tempoRestante--;
+
+        if (tempoRestante <= 300) contador.style.color = "red";
+        else if (tempoRestante <= 900) contador.style.color = "yellow";
+
+        if (tempoRestante < 0) {
+            clearInterval(intervalo);
+            alert("⏰ Tempo encerrado!");
+            frameProva.style.display = "none";
+        }
+
+    }, 1000);
+}
+
+// 🔥 ANIMAÇÃO
+function mostrarVerificacao() {
+
+    let overlay = document.getElementById("overlay");
+    let barra = document.getElementById("barra");
+
+    overlay.style.display = "flex";
+    barra.style.width = "0%";
+
+    let progresso = 0;
+
+    let anim = setInterval(() => {
+        progresso += 2;
+        barra.style.width = progresso + "%";
+
+        if (progresso >= 100) {
+            clearInterval(anim);
+
+            setTimeout(() => {
+                overlay.style.display = "none";
+            }, 800);
+        }
+
+    }, 120);
+}
+
+// 🔥 remove carregando
+function provaCarregada() {
+    document.getElementById("infoProva").innerHTML = "";
+}
+
+// ⚠️ aviso
+function avisoInicial() {
+    return confirm(
+        "⚠️ ATENÇÃO!\n\n" +
+        "Esta avaliação possui monitoramento de comportamento.\n\n" +
+        "• Saídas da tela são detectadas\n" +
+        "• Tempo é controlado automaticamente\n\n" +
+        "Prossiga apenas se estiver pronto."
+    );
+}
+
+// 🔒 tela cheia
+function entrarTelaCheia() {
+    document.documentElement.requestFullscreen();
+}
+
+// 👀 DETECÇÃO DE ABA
+document.addEventListener("visibilitychange", function() {
+
+    if (document.hidden) {
+        alert("⚠️ Saída da aba detectada.");
+    }
+
+    if (!document.hidden) {
+        mostrarVerificacao();
+    }
+
+});
+
+// 👀 tela cheia
+document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) {
+
+        let voltar = confirm(
+            "⚠️ Atenção: saída do modo prova detectada.\n\nClique em OK para continuar."
+        );
+
+        if (voltar) {
+            mostrarVerificacao();
+            entrarTelaCheia();
+        }
+    }
+});
+
+// 🚀 acesso
+function acessarProva() {
+
+    let btn = document.getElementById("btnAcessar");
+    let input = document.getElementById("codigo");
+    let codigo = input.value.toUpperCase().trim();
+
+    const provas = {
+
+        // 🔹 1º ANO
+        
+        "DMAR1MAT1": "https://docs.google.com/forms/d/e/1FAIpQLSel6_ekoikgL-WvTB0yC59m77YOnn0WG8qYxMeGYHw3BGXHag/viewform?embedded=true",
+        "DMAR1NAT1": "https://docs.google.com/forms/d/e/1FAIpQLSf87T1wOkt_G9A5oO3qS2G3Na-WRX6opum86wnIMjPvzJfLKA/viewform?embedded=true%22",
+        "DMAR1HUM1": "https://docs.google.com/forms/d/e/1FAIpQLSdHh1Ldlrgu6swJ1aTymMJCVc5a-qmT4BPDMHd90e0F4dZjww/viewform?embedded=true" ,
+        "DMAR1LIN1": "https://docs.google.com/forms/d/e/1FAIpQLSdW-1Ovew57ft-ZyANhOY9rCW_33RcefgmBhBKKf8Cbqq1SGw/viewform?embedded=true",
+
+        "DMAR1MAT1N": "https://docs.google.com/forms/d/e/1FAIpQLSeTWcW2Ki9HqDTvt46drtENzj6UOq-DK0b66ZfJOrWu3TtWsA/viewform?embedded=true",
+        "DMAR1NAT1N": "https://docs.google.com/forms/d/e/1FAIpQLSe-9YkqYT9u5RCT32l9q5sLz3ZPRA4WnReyOA6fXwjIQ4peHA/viewform?embedded=true%22",
+        "DMAR1HUM1N": "https://docs.google.com/forms/d/e/1FAIpQLSc7YcVVNRdlTujJoJX4rn4ynJdyqT4XIEOqShG_RfxZaoKjVA/viewform?embedded=true" ,
+        "DMAR1LIN1N": "https://docs.google.com/forms/d/e/1FAIpQLScWkeeT8z2vVwj5jNsgc7GJ9h12brNRbY7LbIoD7NqzHo0mSw/viewform?embedded=true",
+
+        // 🔹 2º ANO
+        "DMAR2MAT1": "https://docs.google.com/forms/d/e/1FAIpQLSdwTbM4mBrO8Kmu__Rlv-SNo32NJw9QoIJtnR-lTv1S_lZTPg/viewform?embedded=true",
+        "DMAR2NAT1": "https://docs.google.com/forms/d/e/1FAIpQLSfnDxZGMGpF60jyeMiQdpXwBpwyKjxFK4TmiKXQeqGseIwBew/viewform?embedded=true%22",
+        "DMAR2HUM1": "https://docs.google.com/forms/d/e/1FAIpQLSci0gi2QBd-DzllD2g8y73fnqoM24jtn34iEyDHr4K0PJXPkQ/viewform?embedded=true" ,
+        "DMAR2LIN1": "https://docs.google.com/forms/d/e/1FAIpQLScWB4GIyXL2gImCdlWnJDuu02Cpuz3bseQAMxsaGD4EUVb9zg/viewform?embedded=true" ,
+
+        "DMAR2MAT1N": "https://docs.google.com/forms/d/e/1FAIpQLSddMuOmQCjn3Xhrhk3DAuIFyjy3ljdwmrd42pONdfTD8ZaUag/viewform?embedded=true" ,
+        "DMAR2NAT1N": "https://docs.google.com/forms/d/e/1FAIpQLSeR_TSzWdaxEiRCTE8lWryqhtR6elxFJaZAAihWr_B6MtIK-g/viewform?embedded=true%22",
+        "DMAR2HUM1N": "https://docs.google.com/forms/d/e/1FAIpQLSft9JpHJHMeVqIzcMfhW0fZj5rNKqr1L1hN9pYxqzvico01lw/viewform?embedded=true" ,
+        "DMAR2LIN1N": "https://docs.google.com/forms/d/e/1FAIpQLSfAmuG7s9J0s0p6HnfYj4DdPDfS2l2W7U8PKwIpB2aJg8knTA/viewform?embedded=true",
+
+        // 🔹 3º ANO
+        "DMAR3MAT1": "https://docs.google.com/forms/d/e/1FAIpQLSfHB1pODQjI2WZbInqlHdLk1ZVbcFSBgXi3gKn50j9TPWSUlw/viewform?embedded=true",
+        "DMAR3NAT1": "https://docs.google.com/forms/d/e/1FAIpQLSeQsEvmxjnpZu9dDDdog8dxOfUenu0gxuZNXiUAjetdJGTtZQ/viewform?embedded=true%22",
+        "DMAR3HUM1": "https://docs.google.com/forms/d/e/1FAIpQLSdVBZTH9yeUT3gf6qTt6uAH5J5Ng0KJfQTaVUenGh4KhqBh9w/viewform?embedded=true" ,
+        "DMAR3LIN1": "https://docs.google.com/forms/d/e/1FAIpQLSfA_Hbih1q7CLGO-59B2W7uSkRbCXU8CgBHeF-Awur52R7n9Q/viewform?embedded=true" ,
+
+        "DMAR3MAT1N": "https://docs.google.com/forms/d/e/1FAIpQLScX5fdIWEoiuLwjshqPPe8xYE8VcUxSjDe0cZqOYmZnz5Ys2w/viewform?embedded=true",
+        "DMAR3NAT1N": "https://docs.google.com/forms/d/e/1FAIpQLSdQZpNht8-vGDo17Fu9OMvdjAODIMXPdpY5y8qg1h5Ddsyx_g/viewform?embedded=true%22",
+        "DMAR3HUM1N": "https://docs.google.com/forms/d/e/1FAIpQLSdjRoMwVXdrMk7B8uI9SrAHMBzv3zRggMywE9Z3-COPMQqUYA/viewform?embedded=true" ,
+        "DMAR3LIN1N": "https://docs.google.com/forms/d/e/1FAIpQLSfczBxiEOSGWb3x5GfuaVWFpirCFCC3e6_m13v8-UU9SUdXxQ/viewform?embedded=true"
+    };
+
+    if (!provas[codigo] || provas[codigo] === "") {
+        alert("Código inválido ou prova não disponível.");
+        return;
+    }
+
+    if (!avisoInicial()) return;
+
+    btn.disabled = true;
+
+    document.getElementById("telaInicial").style.display = "none";
+    document.getElementById("infoProva").innerHTML = "Carregando prova...";
+
+    entrarTelaCheia();
+    iniciarContador();
+
+    let frame = document.getElementById("frameProva");
+    frame.src = provas[codigo];
+    frame.style.display = "block";
+
+    input.value = "BOA SORTE!";
+    input.disabled = true;
+}
+</script>
+
+</body>
+</html>
