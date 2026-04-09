@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Avaliações Bimestrais</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background-color: #ffffff;
+    color: #fff;
+    overflow: hidden;
+}
+
+/* CABEÇALHO */
+.topo {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #28016b;
+    text-align: center;
+    padding: 10px;
+    border-bottom: 2px solid #8b5cf6;
+    z-index: 1000;
+}
+
+.logo { width: 55px; }
+
+.topo h2 { margin: 3px 0; font-size: px; }
+.topo p { margin: 2px 0; font-size: 16px; color:#c4b5fd; }
+
+/* INPUT */
+#acesso input {
+    padding: 8px;
+    width: 160px;
+    border-radius: 6px;
+    border: none;
+}
+
+#acesso button {
+    padding: 8px 12px;
+    background: #8b5cf6;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+}
+
+/* CARIMBO */
+#badgeAno {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #8b5cf6;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 800;
+    display: none;
+}
+
+/* CONTADOR */
+#contador {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: #020617;
+    color: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 2000;
+    font-size: 22px;
+}
+
+/* CONTEÚDO */
+#conteudo {
+    position: absolute;
+    top: 140px;
+    height: calc(100vh - 140px);
+    width: 100%;
+}
+
+#telaInicial {
+    text-align: center;
+    margin-top: 40px;
+    color: #8b5cf6;
+}
+
+.check { font-size: 100px; }
+
+iframe {
+    width: 100%;
+    height: 100%;
+    display: none;
+    border: none;
+}
+
+/* OVERLAY */
+#overlay {
+    display:none;
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:rgba(15,10,31,0.95);
+    z-index:3000;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
+</style>
+</head>
+
+<body>
+
+<div id="contador">⏳ 60:00</div>
+
+<div id="overlay">
+    <div style="font-size:22px;">⚙️ Verificando ambiente...</div>
+    <div id="ipOverlay">🌐 IP...</div>
+    <div>🛡️ Comportamento fora do padrão</div>
+
+    <div style="width:250px;height:15px;background:#1e1b4b;margin-top:10px;">
+        <div id="barra" style="width:0%;height:100%;background:#8b5cf6;"></div>
+    </div>
+
+    <div>✅ COORDENAÇÃO NOTIFICADA</div>
+</div>
+
+<div class="topo">
+
+    <img src="imagem1.png" class="logo">
+    <h2>EEMTI DRAGÃO DO MAR</h2>
+    <p>Ambiente de Avaliação Controlado</p>
+    <p><strong>3º DIA - CiÊNCIAS DA NATUREZA</strong></p>
+
+    <p id="ipInfo" style="font-size:11px;">🌐 carregando...</p>
+
+    <div id="acesso">
+        <input type="text" id="codigo" placeholder="Código da prova">
+        <button onclick="acessarProva()">Acessar</button>
+    </div>
+
+    <div id="badgeAno">1º ANO</div>
+
+</div>
+
+<div id="conteudo">
+
+    <div id="telaInicial">
+        <div class="check">✔</div>
+        <div>Ambiente pronto para aplicação da prova</div>
+    </div>
+
+    <iframe id="frameProva"></iframe>
+
+</div>
+
+<script>
+
+let tempo = 3600;
+let iniciado = false;
+
+/* ID DA MÁQUINA */
+let maquinaID = localStorage.getItem("maquinaID");
+if(!maquinaID){
+    maquinaID = "PC-" + Math.random().toString(36).substring(2,8).toUpperCase();
+    localStorage.setItem("maquinaID", maquinaID);
+}
+
+let ipPublico = "Carregando...";
+
+/* IP */
+fetch("https://api.ipify.org?format=json")
+.then(res => res.json())
+.then(data => {
+    ipPublico = data.ip;
+    atualizarInfo();
+});
+
+function atualizarInfo(){
+    let texto = "🌐 IP: "+ipPublico+" | 💻 ID: "+maquinaID;
+    ipInfo.innerText = texto;
+    ipOverlay.innerText = texto;
+}
+
+/* CONTADOR */
+function iniciarContador(){
+    if(iniciado) return;
+    iniciado=true;
+
+    setInterval(()=>{
+        let m=Math.floor(tempo/60);
+        let s=tempo%60;
+        if(s<10)s="0"+s;
+        contador.innerText="⏳ "+m+":"+s;
+        tempo--;
+    },1000);
+}
+
+/* OVERLAY */
+function mostrarVerificacao(){
+    overlay.style.display="flex";
+    barra.style.width="0%";
+
+    let p=0;
+    let i=setInterval(()=>{
+        p+=2;
+        barra.style.width=p+"%";
+
+        if(p>=100){
+            clearInterval(i);
+            setTimeout(()=>overlay.style.display="none",500);
+        }
+    },80);
+}
+
+/* FUNÇÃO CENTRAL DE VIOLAÇÃO */
+function violacao(motivo){
+
+    mostrarVerificacao();
+
+    setTimeout(()=>{
+        alert("⚠️ "+motivo+"\n"+ipPublico+" | "+maquinaID);
+        entrarFullscreen();
+    },300);
+}
+
+/* SEGURANÇA */
+document.addEventListener("visibilitychange",()=>{
+    if(document.hidden){
+        violacao("Saída da aba detectada!");
+    }
+});
+
+document.addEventListener("fullscreenchange",()=>{
+    if(!document.fullscreenElement){
+        violacao("Saída do modo prova detectada!");
+    }
+});
+
+document.addEventListener("keydown",(e)=>{
+    if(e.key==="Escape"){
+        violacao("Tentativa de sair com ESC!");
+    }
+});
+
+document.addEventListener("contextmenu",e=>e.preventDefault());
+
+/* FULLSCREEN */
+function entrarFullscreen(){
+    document.documentElement.requestFullscreen().catch(()=>{});
+}
+
+/* ACESSO */
+function acessarProva(){
+
+    let codigo=document.getElementById("codigo").value.toUpperCase().trim();
+
+    const provas = {
+
+        // 1º ANO
+        DMAR1MAT1:"https://docs.google.com/forms/d/e/1FAIpQLSel6_ekoikgL-WvTB0yC59m77YOnn0WG8qYxMeGYHw3BGXHag/viewform?embedded=true",
+        DMAR1NAT1:"https://docs.google.com/forms/d/e/1FAIpQLSf87T1wOkt_G9A5oO3qS2G3Na-WRX6opum86wnIMjPvzJfLKA/viewform?embedded=true",
+        DMAR1HUM1:"https://docs.google.com/forms/d/e/1FAIpQLSdHh1Ldlrgu6swJ1aTymMJCVc5a-qmT4BPDMHd90e0F4dZjww/viewform?embedded=true",
+        DMAR1LIN1:"https://docs.google.com/forms/d/e/1FAIpQLSdW-1Ovew57ft-ZyANhOY9rCW_33RcefgmBhBKKf8Cbqq1SGw/viewform?embedded=true",
+
+        DMAR1MAT1N:"https://docs.google.com/forms/d/e/1FAIpQLSeTWcW2Ki9HqDTvt46drtENzj6UOq-DK0b66ZfJOrWu3TtWsA/viewform?embedded=true",
+        DMAR1NAT1N:"https://docs.google.com/forms/d/e/1FAIpQLSe-9YkqYT9u5RCT32l9q5sLz3ZPRA4WnReyOA6fXwjIQ4peHA/viewform?embedded=true",
+        DMAR1HUM1N:"https://docs.google.com/forms/d/e/1FAIpQLSc7YcVVNRdlTujJoJX4rn4ynJdyqT4XIEOqShG_RfxZaoKjVA/viewform?embedded=true",
+        DMAR1LIN1N:"https://docs.google.com/forms/d/e/1FAIpQLScWkeeT8z2vVwj5jNsgc7GJ9h12brNRbY7LbIoD7NqzHo0mSw/viewform?embedded=true",
+
+        // 2º ANO
+        DMAR2MAT1:"https://docs.google.com/forms/d/e/1FAIpQLSdwTbM4mBrO8Kmu__Rlv-SNo32NJw9QoIJtnR-lTv1S_lZTPg/viewform?embedded=true",
+        DMAR2NAT1:"https://docs.google.com/forms/d/e/1FAIpQLSfnDxZGMGpF60jyeMiQdpXwBpwyKjxFK4TmiKXQeqGseIwBew/viewform?embedded=true",
+        DMAR2HUM1:"https://docs.google.com/forms/d/e/1FAIpQLSci0gi2QBd-DzllD2g8y73fnqoM24jtn34iEyDHr4K0PJXPkQ/viewform?embedded=true",
+        DMAR2LIN1:"https://docs.google.com/forms/d/e/1FAIpQLScWB4GIyXL2gImCdlWnJDuu02Cpuz3bseQAMxsaGD4EUVb9zg/viewform?embedded=true",
+
+        DMAR2MAT1N:"https://docs.google.com/forms/d/e/1FAIpQLSddMuOmQCjn3Xhrhk3DAuIFyjy3ljdwmrd42pONdfTD8ZaUag/viewform?embedded=true",
+        DMAR2NAT1N:"https://docs.google.com/forms/d/e/1FAIpQLSeR_TSzWdaxEiRCTE8lWryqhtR6elxFJaZAAihWr_B6MtIK-g/viewform?embedded=true",
+        DMAR2HUM1N:"https://docs.google.com/forms/d/e/1FAIpQLSft9JpHJHMeVqIzcMfhW0fZj5rNKqr1L1hN9pYxqzvico01lw/viewform?embedded=true",
+        DMAR2LIN1N:"https://docs.google.com/forms/d/e/1FAIpQLSfAmuG7s9J0s0p6HnfYj4DdPDfS2l2W7U8PKwIpB2aJg8knTA/viewform?embedded=true",
+
+        // 3º ANO
+        DMAR3MAT1:"https://docs.google.com/forms/d/e/1FAIpQLSfHB1pODQjI2WZbInqlHdLk1ZVbcFSBgXi3gKn50j9TPWSUlw/viewform?embedded=true",
+        DMAR3NAT1:"https://docs.google.com/forms/d/e/1FAIpQLSeQsEvmxjnpZu9dDDdog8dxOfUenu0gxuZNXiUAjetdJGTtZQ/viewform?embedded=true",
+        DMAR3HUM1:"https://docs.google.com/forms/d/e/1FAIpQLSdVBZTH9yeUT3gf6qTt6uAH5J5Ng0KJfQTaVUenGh4KhqBh9w/viewform?embedded=true",
+        DMAR3LIN1:"https://docs.google.com/forms/d/e/1FAIpQLSfA_Hbih1q7CLGO-59B2W7uSkRbCXU8CgBHeF-Awur52R7n9Q/viewform?embedded=true",
+
+        DMAR3MAT1N:"https://docs.google.com/forms/d/e/1FAIpQLScX5fdIWEoiuLwjshqPPe8xYE8VcUxSjDe0cZqOYmZnz5Ys2w/viewform?embedded=true",
+        DMAR3NAT1N:"https://docs.google.com/forms/d/e/1FAIpQLSdQZpNht8-vGDo17Fu9OMvdjAODIMXPdpY5y8qg1h5Ddsyx_g/viewform?embedded=true",
+        DMAR3HUM1N:"https://docs.google.com/forms/d/e/1FAIpQLSdjRoMwVXdrMk7B8uI9SrAHMBzv3zRggMywE9Z3-COPMQqUYA/viewform?embedded=true",
+        DMAR3LIN1N:"https://docs.google.com/forms/d/e/1FAIpQLSfczBxiEOSGWb3x5GfuaVWFpirCFCC3e6_m13v8-UU9SUdXxQ/viewform?embedded=true"
+    };
+
+    if(!provas[codigo]){
+        alert("Código inválido");
+        return;
+    }
+
+    iniciarContador();
+
+    acesso.style.display="none";
+    telaInicial.style.display="none";
+
+    badgeAno.innerText=codigo[4]+"º ANO";
+    badgeAno.style.display="block";
+
+    frameProva.src=provas[codigo];
+    frameProva.style.display="block";
+
+    entrarFullscreen();
+}
+</script>
+
+</body>
+</html>
